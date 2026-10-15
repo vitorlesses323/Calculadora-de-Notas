@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Notas - Rede Estadual RS</title>
+  <style>
+    :root {
+      /* Esquema de cores (Verde elegante) */
+      --primary: #1b5e20;
+      --primary-light: #4c8c4a;
+      --bg: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #212121;
+      --text-secondary: #555555;
+      --border: #e0e0e0;
+      --success: #2e7d32;
+      --warning: #ef6c00;
+      --danger: #c62828;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Cabeçalho Global */
+    .app-header {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      padding: 24px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      position: relative;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .header-content {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    /* Grupo da Marca (Logo + Título) */
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Container da Logo Exata VLR LESSES */
+    .brand-logo-vlr {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 90px;
+      height: 75px;
+      flex-shrink: 0;
+    }
+
+    .app-title h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+      letter-spacing: -0.5px;
+    }
+    
+    .app-title p {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    /* Botão Guia de Uso */
+    .btn-guide-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #f1f3f5;
+      border: 1px solid #dcdfe3;
+      padding: 8px 16px;
+      border-radius: 24px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: transform 0.1s, background 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-guide-pill:hover {
+      background-color: #e2e6ea;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    }
+
+    .btn-guide-pill:active {
+      transform: scale(0.97);
+    }
+
+    .btn-guide-pill .icon-q {
+      color: #ff3366;
+      font-weight: 900;
+      font-size: 1.1rem;
+    }
+
+    .btn-guide-pill .text {
+      color: #003366;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    /* Container Principal */
+    .subjects-container {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 0 16px;
+    }
+
+    /* Card da Matéria */
+    .subject-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header {
+      background: #fafafa;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .materia-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--primary);
+      outline: none;
+      border-bottom: 2px dashed transparent;
+      padding: 4px 0;
+    }
+    
+    .materia-input:focus {
+      border-bottom: 2px dashed var(--primary-light);
+    }
+
+    .btn-delete {
+      background: transparent;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: 0.2s;
+    }
+
+    .btn-delete:hover {
+      color: var(--danger);
+      background: #ffebee;
+    }
+
+    .card-body {
+      padding: 16px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .input-group {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      outline: none;
+      transition: 0.2s;
+      background-color: #fafafa;
+    }
+
+    .input-group input:focus {
+      border-color: var(--primary);
+      background-color: #fff;
+      box-shadow: 0 0 0 2px rgba(27, 94, 32, 0.1);
+    }
+
+    .card-footer {
+      padding: 12px 16px;
+      background: #f8f9fa;
+      border-top: 1px solid var(--border);
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-text { color: var(--text-secondary); }
+    .status-success { color: var(--success); }
+    .status-warning { color: var(--warning); }
+    .status-danger { color: var(--danger); }
+
+    /* Botão Adicionar Matéria */
+    .btn-add {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      width: calc(100% - 32px);
+      max-width: 600px;
+      margin: 8px 16px 32px 16px;
+      box-shadow: 0 4px 12px rgba(27, 94, 32, 0.2);
+      transition: 0.2s;
+    }
+
+    .btn-add:hover { background-color: var(--primary-light); }
+    .btn-add:active { transform: scale(0.98); }
+
+    /* Modal de Guia de Uso */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 1000; opacity: 0; visibility: hidden;
+      transition: all 0.3s ease; padding: 16px;
+    }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .modal-content {
+      background: white; border-radius: 16px; max-width: 450px; width: 100%;
+      padding: 24px; transform: translateY(20px); transition: all 0.3s ease; position: relative;
+    }
+    .modal-overlay.active .modal-content { transform: translateY(0); }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px; background: #f1f3f4; border: none;
+      width: 30px; height: 30px; border-radius: 50%; font-size: 1.2rem; cursor: pointer;
+    }
+    .modal-close:hover { background: #e0e0e0; }
+    .modal-title { color: var(--primary); margin-bottom: 16px; font-size: 1.2rem; }
+    .modal-body p { font-size: 0.9rem; line-height: 1.6; margin-bottom: 12px; color: var(--text-secondary); }
+    
+    .alert-box {
+      background-color: #fff3e0; border-left: 4px solid var(--warning);
+      padding: 12px; border-radius: 4px; margin: 16px 0; font-size: 0.85rem; color: #e65100;
+    }
+
+    /* Responsividade */
+    @media (max-width: 480px) {
+      .header-content {
+        justify-content: center;
+        text-align: center;
+      }
+      .brand-group {
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-header">
+    <div class="header-content">
+      
+      <!-- LOGO E TÍTULO -->
+      <div class="brand-group">
+        
+        <div class="brand-logo-vlr" title="Vitor Lesses (VLR LESSES)">
+          <!-- SVG Refinado com sombra sutil e cantos harmonizados -->
+          <svg width="100%" height="100%" viewBox="0 0 170 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="logo-shadow" x="-10%" y="-10%" width="120%" height="120%">
+                <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.25"/>
+              </filter>
+            </defs>
+
+            <g filter="url(#logo-shadow)">
+              <!-- Letra V -->
+              <path d="M 12 15 L 43 73 L 73 15 L 57 15 L 43 45 L 28 15 Z" fill="#ffffff" />
+              
+              <!-- Letra L -->
+              <path d="M 72 15 L 72 73 L 110 73 L 110 59 L 86 59 L 86 15 Z" fill="#ffffff" />
+              
+              <!-- Letra R com curvas aprimoradas -->
+              <path d="M 92 15 L 132 15 C 154 15 154 47 132 47 L 102 47 L 102 15 Z M 102 27 L 102 35 L 126 35 C 136 35 136 27 126 27 Z" fill="#ffffff" />
+              <path d="M 120 42 L 144 73 L 129 73 L 107 46 Z" fill="#ffffff" />
+              
+              <!-- Sobrenome LESSES -->
+              <text x="86" y="93" fill="#ffffff" font-family="'Segoe UI', system-ui, sans-serif" font-weight="800" font-size="14.5" letter-spacing="6.5" text-anchor="middle">LESSES</text>
+            </g>
+          </svg>
+        </div>
+        
+        <div class="app-title">
+          <h1>Calculadora de Notas RS</h1>
+          <p>Média 6.0 | Pesos 3, 3 e 4</p>
+        </div>
+
+      </div>
+      
+      <!-- Botão Guia de Uso -->
+      <button class="btn-guide-pill" onclick="openModal()">
+        <span class="icon-q">?</span>
+        <span class="text">Guia de Uso</span>
+      </button>
+      
+    </div>
+  </div>
+
+  <div class="subjects-container" id="subjectsList">
+    <!-- Os cards das matérias serão injetados aqui pelo JavaScript -->
+  </div>
+
+  <button class="btn-add" onclick="addSubject()">+ Adicionar Matéria</button>
+
+  <!-- Modal de Guia de Uso -->
+  <div class="modal-overlay" id="guideModal" onclick="closeModalOutside(event)">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <h2 class="modal-title">Como usar a calculadora?</h2>
+      
+      <div class="modal-body">
+        <div class="alert-box">
+          <strong>Atenção à Recuperação Contínua!</strong>
+          Se você fez a prova de recuperação de algum trimestre, a regra do RS diz que prevalece a <b>maior nota</b>. 
+          <br><i>Exemplo:</i> Se tirou 8 no trimestre, fez a recuperação e tirou 9,3... <b>Digite 9,3!</b>
+        </div>
+
+        <p><strong>Passo a passo:</strong></p>
+        <p>1. Clique em <strong>"+ Adicionar Matéria"</strong> para incluir as disciplinas que deseja calcular (ex: Física, Matemática).</p>
+        <p>2. Digite a sua maior nota final do <strong>1º trimestre</strong> e do <strong>2º trimestre</strong>.</p>
+        <p>3. O cálculo é feito <strong>automaticamente</strong>! A ferramenta multiplica suas notas pelos pesos (3, 3 e 4) e mostra exatamente quanto falta tirar no final do ano.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Gerenciamento de Dados (Apenas em Memória)
+    let subjects = [];
+
+    // Inicializa com uma matéria vazia ao abrir a página
+    addSubject();
+
+    function addSubject() {
+      const newId = Date.now().toString();
+      subjects.push({
+        id: newId,
+        name: '',
+        t1: '',
+        t2: ''
+      });
+      renderAll();
+    }
+
+    function removeSubject(id) {
+      if(confirm("Tem certeza que deseja remover esta matéria?")) {
+        subjects = subjects.filter(sub => sub.id !== id);
+        renderAll();
+      }
+    }
+
+    // Atualiza os dados quando o aluno digita algo
+    function handleInput(id, field, value) {
+      const subjectIndex = subjects.findIndex(sub => sub.id === id);
+      if (subjectIndex > -1) {
+        // Formata para aceitar vírgula ou ponto nas notas
+        if(field !== 'name') {
+           value = value.replace(',', '.');
+        }
+        subjects[subjectIndex][field] = value;
+        
+        // Recalcula apenas o rodapé do card modificado
+        updateCardFooter(id, subjects[subjectIndex].t1, subjects[subjectIndex].t2);
+      }
+    }
+
+    // Calcula e retorna o texto do resultado
+    function calculateResult(t1_str, t2_str) {
+      if (!t1_str || !t2_str) return { text: "Preencha T1 e T2", class: "status-text" };
+      
+      const n1 = parseFloat(t1_str);
+      const n2 = parseFloat(t2_str);
+
+      if (isNaN(n1) || isNaN(n2) || n1 < 0 || n1 > 10 || n2 < 0 || n2 > 10) {
+        return { text: "Notas inválidas (0 a 10)", class: "status-danger" };
+      }
+
+      const pontosAcumulados = (n1 * 3) + (n2 * 3);
+      const pontosFaltantes = 60 - pontosAcumulados;
+      let notaNecessaria = pontosFaltantes / 4;
+
+      if (notaNecessaria <= 0) {
+        return { text: "Já Aprovado! 🎉", class: "status-success" };
+      } else if (notaNecessaria <= 10) {
+        notaNecessaria = Math.ceil(notaNecessaria * 10) / 10;
+        let colorClass = notaNecessaria <= 6.0 ? 'status-success' : (notaNecessaria <= 8.5 ? 'status-warning' : 'status-danger');
+        return { text: `Falta ${notaNecessaria.toFixed(1)} no 3º Tri`, class: colorClass };
+      } else {
+        return { text: "Exame Final Necessário", class: "status-danger" };
+      }
+    }
+
+    // Atualiza apenas a mensagem de resultado do card sem recarregar a tela inteira
+    function updateCardFooter(id, t1, t2) {
+      const footerSpan = document.getElementById(`res_${id}`);
+      if(footerSpan) {
+        const result = calculateResult(t1, t2);
+        footerSpan.className = result.class;
+        footerSpan.textContent = result.text;
+      }
+    }
+
+    // Renderiza todos os cards na tela
+    function renderAll() {
+      const container = document.getElementById('subjectsList');
+      container.innerHTML = ''; // Limpa a tela
+
+      subjects.forEach(sub => {
+        const result = calculateResult(sub.t1, sub.t2);
+        
+        const card = document.createElement('div');
+        card.className = 'subject-card';
+        card.innerHTML = `
+          <div class="card-header">
+            <input type="text" class="materia-input" placeholder="Nome da Matéria (Ex: Física)" 
+                   value="${sub.name}" oninput="handleInput('${sub.id}', 'name', this.value)">
+            <button class="btn-delete" onclick="removeSubject('${sub.id}')" title="Excluir matéria">🗑️</button>
+          </div>
+          <div class="card-body">
+            <div class="input-group">
+              <label>Nota 1º Trimestre</label>
+              <input type="number" step="0.1" min="0" max="10" placeholder="Ex: 7.5" 
+                     value="${sub.t1}" oninput="handleInput('${sub.id}', 't1', this.value)">
+            </div>
+            <div class="input-group">
+              <label>Nota 2º Trimestre</label>
+              <input type="number" step="0.1" min="0" max="10" placeholder="Ex: 8.0" 
+                     value="${sub.t2}" oninput="handleInput('${sub.id}', 't2', this.value)">
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>Status:</span>
+            <span id="res_${sub.id}" class="${result.class}">${result.text}</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Funções do Modal de Ajuda
+    function openModal() { document.getElementById('guideModal').classList.add('active'); }
+    function closeModal() { document.getElementById('guideModal').classList.remove('active'); }
+    function closeModalOutside(event) { if (event.target === document.getElementById('guideModal')) closeModal(); }
+  </script>
+</body>
+</html>
